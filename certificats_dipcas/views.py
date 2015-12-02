@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
 from certificats_dipcas.forms import Formulari_Municipi
+import os
 
 
 def generar_contrasenya(request):
@@ -37,6 +38,7 @@ def generar_contrasenya(request):
           
     return render(request, 'formulari_municipi.html', {'form': form}) 
 
+
 def convertir_certificat(request):
     """
     Script per a convertir un certificat en format binari a format pfx
@@ -46,8 +48,8 @@ def convertir_certificat(request):
         if form.is_valid():
             cd = form.cleaned_data 
             nom_municipi = cd['nom_del_municipi']
-            os.system("openssl x509 -inform DER -in "+request.FILES['certificat']+" -outform PEM -out "+ "sello_"+nom_municipi+".crt")
-            os.system("openssl pkcs12 -export -inkey "+request.FILES['clau']+" -CApath ./accv -in "+"sello_"+nom_municipi+".crt"+" -out "+"sello_"+nom_municipi+".pfx")
+            os.system("openssl x509 -inform DER -in "+str(request.FILES['certificat'])+" -outform PEM -out "+ "sello_"+nom_municipi+".crt")
+            os.system("openssl pkcs12 -export -inkey "+str(request.FILES['clau'])+" -CApath ./accv -in "+"sello_"+nom_municipi+".crt"+" -out "+"sello_"+nom_municipi+".pfx")
             
             return render(request,'certificat_convertit.html',{'nom_municipi':nom_municipi}) 
 
