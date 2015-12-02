@@ -19,5 +19,5 @@ from django.contrib import admin
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^generar_contrasenya/','certificats_dipcas.views.generar_contrasenya'),
-    
+    url(r'^convertir_certificat/','certificats_dipcas.views.convertir_certificat'),  
 ]
