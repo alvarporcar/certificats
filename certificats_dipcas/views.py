@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
-from certificats_dipcas.forms import Formulari_Municipi
+from forms import FormCertificats
+from models import Certificats
 import os
 
 
@@ -40,22 +41,20 @@ def generar_contrasenya(request):
 
 
 def convertir_certificat(request):
-    """
-    Script per a convertir un certificat en format binari a format pfx
-    """
+     
     if request.method == 'POST':
-        form = Formulari_Municipi(request.POST, request.FILES) 
+        form = FormCertificats(request.POST, request.FILES)
         if form.is_valid():
-            cd = form.cleaned_data 
-            nom_municipi = cd['nom_del_municipi']
-            os.system("openssl x509 -inform DER -in "+str(request.FILES['certificat'])+" -outform PEM -out "+ "sello_"+nom_municipi+".crt")
-            os.system("openssl pkcs12 -export -inkey "+str(request.FILES['clau'])+" -CApath ./accv -in "+"sello_"+nom_municipi+".crt"+" -out "+"sello_"+nom_municipi+".pfx")
-            
-            return render(request,'certificat_convertit.html',{'nom_municipi':nom_municipi}) 
+            municipi = request.POST['municipi']
+            certificat = request.FILES['certificat']
+            clau = request.FILES['clau']
+            insert = Certificats(municipi=municipi, certificat=certificat, clau=clau)
+            insert.save()
+            os.system("openssl x509 -inform DER -in "+[os.path.join(BASE_DIR,'templates')]      str(certificat)+" -outform PEM -out "+ "sello_"+str(municipi)+".crt")
+
+            return render(request,'certificat_convertit.html',{'municipi':municipi}) 
 
     else:
-        form = Formulari_Municipi() 
-          
-    return render(request, 'formulari_municipi.html', {'form': form}) 
+        form = FormCertificats()
     
-    
+    return render(request, 'formulari_certificat.html', {'form': form}) 
